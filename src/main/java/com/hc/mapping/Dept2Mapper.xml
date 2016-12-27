@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hc.dao.Dept2Dao">
+
+  <cache></cache> <!--开始二级缓存-->
+
+  <resultMap id="BaseResultMap" type="com.hc.domain.Dept2">
+    <id column="deptno" jdbcType="INTEGER" property="deptno" />
+    <result column="dname" jdbcType="VARCHAR" property="dname" />
+    <result column="loc" jdbcType="VARCHAR" property="loc" />
+    <result column="kouhao" jdbcType="VARCHAR" property="kouhao" />
+    <result column="yusuan" jdbcType="INTEGER" property="yusuan" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    deptno, dname, loc,kouhao,yusuan
+  </sql>
+  <select id="selectByPrimaryKey" resultType="com.hc.domain.Dept2" parameterType="int">
+    select
+    <include refid="Base_Column_List" />
+    from dept
+    where deptno = #{deptno,jdbcType=INTEGER}
+  </select>
+
+  <!--select * from dept where deptno = 1 and dname='aa' and loc='aa'-->
+
+  <sql id="dept_query_where">
+    <!-- 使用动态sql，通过if判断，满足条件进行sql拼接 -->
+    <if test="deptQuery !=null">
+      <if test="deptQuery.dept2!=null">
+        <if test="deptQuery.dept2.deptno!=null and deptQuery.dept2.deptno!=''">
+          deptno = ${deptQuery.dept2.deptno}
+        </if>
+        <if test="deptQuery.dept2.dname!=null and deptQuery.dept2.dname!=''">
+          and dname like '%${deptQuery.dept2.dname}%'
+        </if>
+        <if test="deptQuery.dept2.loc!=null and deptQuery.dept2.loc!=''">
+          and loc like '%${deptQuery.dept2.loc}%'
+        </if>
+        <if test="deptQuery.dept2.kouhao!=null and deptQuery.dept2.kouhao!=''">
+          and kouhao like '%${deptQuery.dept2.kouhao}%'
+        </if>
+        <if test="deptQuery.dept2.yusuan!=null and deptQuery.dept2.yusuan!=''">
+          and yusuan between ${deptQuery.dept2.yusuan-150} and   ${deptQuery.dept2.yusuan+150}
+        </if>
+      </if>
+    </if>
+  </sql>
+
+  <select id="selectDept2s" resultType="com.hc.domain.Dept2" parameterType="com.hc.domain.DeptQuery">
+    SELECT
+    <include refid="Base_Column_List" />
+    from dept
+    <where>
+<!--      where下面第一个if语句中以and开头，也可以省略第一个and ，如果第一个if语句中有and；mybatis会将第一个and忽略  -->
+      <include refid="dept_query_where"></include>
+    </where>
+  </select>
+
+</mapper>
